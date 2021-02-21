@@ -31,24 +31,72 @@ app.get("/",(req,res)=>{
     res.render('index.html');
   });
 
-app.get("/url/emotion", (req,res) => {
+const understandLanguage = (analyzeParams, res) => {
+    const nluInstance = getNLUInstance();
+    nluInstance.analyze(analyzeParams)
+    .then(analysisResults => {
+        console.log(JSON.stringify(analysisResults, null, 2));
+        res.send(analysisResults);
+    })
+    .catch(err => {
+        console.log('error:', err);
+        res.status(404).send(err);
+    });
+}
 
-    return res.send({"happy":"90","sad":"10"});
+app.get("/url/emotion", (req,res) => {
+    const url = req.query.url;
+    const analyzeParams = {
+        'url': url,
+        'features': {
+            'emotion': {
+                'document': true
+            }
+        }
+    };
+    understandLanguage(analyzeParams, res);
 });
 
 app.get("/url/sentiment", (req,res) => {
-    return res.send("url sentiment for "+req.query.url);
+    const url = req.query.url;
+    const analyzeParams = {
+        'url': url,
+        'features': {
+            'sentiment': {
+                'document': true
+            }
+        }
+    };
+    understandLanguage(analyzeParams, res);
 });
 
 app.get("/text/emotion", (req,res) => {
-    return res.send({"happy":"10","sad":"90"});
+    const text = req.query.text;
+    const analyzeParams = {
+        'text': text,
+        'features': {
+            'emotion': {
+                'document': true
+            }
+        }
+    };
+    understandLanguage(analyzeParams, res);
 });
 
 app.get("/text/sentiment", (req,res) => {
-    return res.send("text sentiment for "+req.query.text);
+    const text = req.query.text;
+    const analyzeParams = {
+        'text': text,
+        'features': {
+            'sentiment': {
+                'document': true
+            }
+        }
+    };
+    understandLanguage(analyzeParams, res);
 });
 
 let server = app.listen(8080, () => {
     console.log('Listening', server.address().port)
-})
+});
 
